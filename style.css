@@ -1,6 +1,6 @@
 :root {
   --bg: #f4f6fb;
-  --card: rgba(255, 255, 255, 0.92);
+  --card: rgba(255, 255, 255, 0.94);
   --text: #1f2937;
   --muted: #6b7280;
   --main: #111827;
@@ -10,7 +10,12 @@
 }
 
 * {
+  box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -95,7 +100,6 @@ textarea {
   padding: 13px;
   margin: 8px 0;
   font-size: 16px;
-  box-sizing: border-box;
   border-radius: 14px;
   font-family: inherit;
 }
@@ -147,7 +151,7 @@ button.danger,
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 #resultModeText {
@@ -160,6 +164,35 @@ button.danger,
   color: #3730a3;
   font-size: 13px;
 }
+
+/* メンバー */
+
+.member-item {
+  margin: 10px 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  animation: itemIn 0.25s ease both;
+}
+
+.member-name {
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.member-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.member-actions button {
+  padding: 9px;
+  font-size: 14px;
+}
+
+/* 対象メンバー */
 
 #targetMembers {
   display: grid;
@@ -188,13 +221,19 @@ button.danger,
 
 .member-check span {
   font-size: 15px;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.member-item,
-.history-item,
+/* 精算結果 */
+
+#resultList,
+#historyList {
+  padding-left: 0;
+}
+
 .result-item {
   list-style: none;
   margin: 10px 0;
@@ -203,46 +242,6 @@ button.danger,
   border-radius: 14px;
   border: 1px solid #e5e7eb;
   animation: itemIn 0.25s ease both;
-}
-
-.member-name,
-.history-main {
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-
-.member-actions,
-.history-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.member-actions button,
-.history-actions button {
-  padding: 9px;
-  font-size: 14px;
-}
-
-.history-area {
-  animation: openArea 0.25s ease both;
-}
-
-.history-title {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 800;
-  color: #3730a3;
-  background: #eef2ff;
-  padding: 4px 8px;
-  border-radius: 999px;
-  margin-bottom: 6px;
-}
-
-.history-sub {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 8px;
 }
 
 .result-row {
@@ -260,13 +259,64 @@ button.danger,
 
 .result-text {
   flex: 1;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .result-paid {
   opacity: 0.55;
   text-decoration: line-through;
 }
+
+/* 履歴 */
+
+.history-area {
+  animation: openArea 0.25s ease both;
+}
+
+.history-item {
+  list-style: none;
+  margin: 10px 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  animation: itemIn 0.25s ease both;
+}
+
+.history-title {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 800;
+  color: #3730a3;
+  background: #eef2ff;
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
+
+.history-main {
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.history-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.history-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.history-actions button {
+  padding: 9px;
+  font-size: 14px;
+}
+
+/* トースト */
 
 .toast {
   position: fixed;
@@ -289,6 +339,8 @@ button.danger,
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* アニメーション */
 
 @keyframes pageFade {
   from { opacity: 0; }
@@ -349,5 +401,14 @@ button.danger,
   to {
     opacity: 1;
     transform: scale(1) rotate(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
