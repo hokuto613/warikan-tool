@@ -1,6 +1,7 @@
 let members = JSON.parse(localStorage.getItem("members")) || [];
 let payments = JSON.parse(localStorage.getItem("payments")) || [];
 let resultMode = "minimum";
+let historyVisible = false;
 
 function saveData() {
   localStorage.setItem("members", JSON.stringify(members));
@@ -57,6 +58,23 @@ function addPayment() {
 
   document.getElementById("amount").value = "";
 
+  saveData();
+  render();
+}
+
+function deletePayment(index) {
+  const payment = payments[index];
+
+  if (!payment) return;
+
+  const message =
+    `${payment.payer} が ${payment.amount}円 支払い\n` +
+    `対象：${payment.targets.join("、")}\n\n` +
+    `この履歴を削除しますか？`;
+
+  if (!confirm(message)) return;
+
+  payments.splice(index, 1);
   saveData();
   render();
 }
@@ -170,17 +188,19 @@ function toggleResultMode() {
   render();
 }
 
-function render() {
+function toggleHistory() {
+  historyVisible = !historyVisible;
+  render();
+}
+
+function renderMembers() {
   const memberList = document.getElementById("memberList");
   const payer = document.getElementById("payer");
   const targetMembers = document.getElementById("targetMembers");
-  const resultList = document.getElementById("resultList");
-  const resultModeText = document.getElementById("resultModeText");
 
   memberList.innerHTML = "";
   payer.innerHTML = "";
   targetMembers.innerHTML = "";
-  resultList.innerHTML = "";
 
   members.forEach(member => {
     const li = document.createElement("li");
@@ -208,16 +228,24 @@ function render() {
     label.appendChild(span);
     targetMembers.appendChild(label);
   });
+}
+
+function renderResults() {
+  const resultList = document.getElementById("resultList");
+  const resultModeText = document.getElementById("resultModeText");
+  const toggleButton = document.querySelector("button[onclick='toggleResultMode()']");
+
+  resultList.innerHTML = "";
 
   let results;
 
   if (resultMode === "minimum") {
     resultModeText.textContent = "最小精算方式";
-    document.querySelector("button[onclick='toggleResultMode()']").textContent = "履歴反映方式に切替";
+    toggleButton.textContent = "履歴反映方式に切替";
     results = calculateMinimumMode();
   } else {
     resultModeText.textContent = "履歴反映方式";
-    document.querySelector("button[onclick='toggleResultMode()']").textContent = "最小精算方式に切替";
+    toggleButton.textContent = "最小精算方式に切替";
     results = calculateHistoryMode();
   }
 
@@ -232,6 +260,60 @@ function render() {
       resultList.appendChild(li);
     });
   }
+}
+
+function renderHistory() {
+  const historyArea = document.getElementById("historyArea");
+  const historyList = document.getElementById("historyList");
+  const historyButton = document.querySelector("button[onclick='toggleHistory()']");
+
+  historyList.innerHTML = "";
+
+  if (historyVisible) {
+    historyArea.classList.remove("hidden");
+    historyButton.textContent = "履歴を非表示";
+  } else {
+    historyArea.classList.add("hidden");
+    historyButton.textContent = "履歴を表示";
+    return;
+  }
+
+  if (payments.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "履歴はありません";
+    historyList.appendChild(li);
+    return;
+  }
+
+  payments.forEach((payment, index) => {
+    const li = document.createElement("li");
+    li.className = "history-item";
+
+    const main = document.createElement("div");
+    main.className = "history-main";
+    main.textContent = `${index + 1}. ${payment.payer} が ${payment.amount}円 支払い`;
+
+    const sub = document.createElement("div");
+    sub.className = "history-sub";
+    sub.textContent = `対象：${payment.targets.join("、")}`;
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "history-delete";
+    deleteButton.textContent = "この履歴を削除";
+    deleteButton.onclick = () => deletePayment(index);
+
+    li.appendChild(main);
+    li.appendChild(sub);
+    li.appendChild(deleteButton);
+
+    historyList.appendChild(li);
+  });
+}
+
+function render() {
+  renderMembers();
+  renderResults();
+  renderHistory();
 }
 
 function clearInput() {
