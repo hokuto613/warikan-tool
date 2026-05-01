@@ -452,7 +452,7 @@ function resultToText(result) {
 }
 
 function getResultKey(result) {
-  return `${resultMode}:${result.from}->${result.to}:${Math.round(result.amount)}`;
+  return `${result.from}->${result.to}:${Math.round(result.amount)}`;
 }
 
 /* 支払い済みチェック */
