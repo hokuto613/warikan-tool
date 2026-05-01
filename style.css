@@ -32,12 +32,39 @@ button {
   color: white;
 }
 
+button.sub {
+  background: #666;
+}
+
+button.danger {
+  background: #c0392b;
+}
+
 ul {
   padding-left: 20px;
+}
+
+#targetMembers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .member-check {
   display: flex;
   align-items: center;
   gap: 8px;
+  background: #f1f3f5;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.member-check input {
+  width: auto;
+  margin: 0;
+}
+
+.member-check span {
+  font-size: 15px;
 }
