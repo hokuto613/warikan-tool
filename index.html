@@ -47,24 +47,20 @@
       <ul id="resultList"></ul>
     </section>
 
-<section class="card">
-  <h2>共有・読み込み</h2>
-
-  <button onclick="generateShareText()">共有テキスト作成</button>
-  <button class="sub" onclick="copyShareText()">テキストをコピー</button>
-  <button class="sub" onclick="clearShareText()">共有テキストをクリア</button>
-
-  <label>共有テキスト</label>
-  <textarea id="shareText" placeholder="ここに共有用テキストが表示されます。LINEにそのまま貼れます。"></textarea>
-
-  <button onclick="importShareText()">このテキストを読み込む</button>
-</section>
+    <section class="card">
+      <h2>支払い履歴</h2>
+      <button class="sub" onclick="toggleHistory()">履歴を表示</button>
+      <div id="historyArea" class="history-area hidden">
+        <ul id="historyList"></ul>
+      </div>
+    </section>
 
     <section class="card">
       <h2>共有・読み込み</h2>
 
       <button onclick="generateShareText()">共有テキスト作成</button>
       <button class="sub" onclick="copyShareText()">テキストをコピー</button>
+      <button class="sub" onclick="clearShareText()">共有テキストをクリア</button>
 
       <label>共有テキスト</label>
       <textarea id="shareText" placeholder="ここに共有用テキストが表示されます。LINEにそのまま貼れます。"></textarea>
