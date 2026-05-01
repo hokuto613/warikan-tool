@@ -1,6 +1,7 @@
 let members = JSON.parse(localStorage.getItem("members")) || [];
 let payments = JSON.parse(localStorage.getItem("payments")) || [];
 let paidChecks = JSON.parse(localStorage.getItem("paidChecks")) || {};
+
 let resultMode = "minimum";
 let historyVisible = false;
 let editingPaymentIndex = null;
@@ -31,6 +32,8 @@ function resetPaidChecks() {
   paidChecks = {};
   localStorage.setItem("paidChecks", JSON.stringify(paidChecks));
 }
+
+/* メンバー */
 
 function addMember() {
   const nameInput = document.getElementById("memberName");
@@ -112,6 +115,8 @@ function deleteMember(name) {
   render();
   showToast("メンバーを削除しました");
 }
+
+/* 支払い登録・編集 */
 
 function getPaymentFormData() {
   const title = document.getElementById("paymentTitle").value.trim() || "無題";
@@ -220,6 +225,8 @@ function deletePayment(index) {
   render();
   showToast("履歴を削除しました");
 }
+
+/* 計算 */
 
 function getRawDebts() {
   const debts = {};
@@ -339,6 +346,8 @@ function getResultKey(result) {
   return `${resultMode}:${result.from}->${result.to}:${Math.round(result.amount)}`;
 }
 
+/* 支払い済みチェック */
+
 function togglePaidCheck(key, checked) {
   if (checked) {
     paidChecks[key] = true;
@@ -358,6 +367,8 @@ function clearPaidChecks() {
   showToast("支払い済みチェックをクリアしました");
 }
 
+/* 表示切替 */
+
 function toggleResultMode() {
   resultMode = resultMode === "minimum" ? "history" : "minimum";
   render();
@@ -368,6 +379,8 @@ function toggleHistory() {
   historyVisible = !historyVisible;
   render();
 }
+
+/* 描画 */
 
 function renderMembers() {
   const memberList = document.getElementById("memberList");
@@ -571,6 +584,8 @@ function render() {
   renderHistory();
 }
 
+/* クリア */
+
 function clearPaymentInputsOnly() {
   document.getElementById("paymentTitle").value = "";
   document.getElementById("amount").value = "";
@@ -614,6 +629,8 @@ function clearAll() {
   render();
   showToast("全データを削除しました");
 }
+
+/* 共有テキスト */
 
 function encodeData(data) {
   const json = JSON.stringify(data);
