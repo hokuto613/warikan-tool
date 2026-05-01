@@ -1,460 +1,377 @@
-let members = JSON.parse(localStorage.getItem("members")) || [];
-let payments = JSON.parse(localStorage.getItem("payments")) || [];
-let resultMode = "minimum";
-let historyVisible = false;
-
-function saveData() {
-  localStorage.setItem("members", JSON.stringify(members));
-  localStorage.setItem("payments", JSON.stringify(payments));
+:root {
+  --bg: #f4f6fb;
+  --card: rgba(255, 255, 255, 0.92);
+  --text: #1f2937;
+  --muted: #6b7280;
+  --main: #111827;
+  --sub: #6b7280;
+  --danger: #dc2626;
+  --border: #e5e7eb;
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
 }
 
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 1600);
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
-function addMember() {
-  const nameInput = document.getElementById("memberName");
-  const name = nameInput.value.trim();
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, #dbeafe 0, transparent 35%),
+    radial-gradient(circle at top right, #fce7f3 0, transparent 32%),
+    var(--bg);
+  color: var(--text);
+}
 
-  if (!name) {
-    alert("名前を入力してください");
-    return;
+main {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 18px;
+  animation: pageFade 0.55s ease both;
+}
+
+.app-header {
+  text-align: center;
+  padding: 20px 8px 14px;
+  animation: slideDown 0.55s ease both;
+}
+
+.app-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #111827, #374151);
+  color: white;
+  font-size: 28px;
+  font-weight: 900;
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.25);
+  animation: popIn 0.6s cubic-bezier(.2, 1.4, .4, 1) both;
+}
+
+h1 {
+  margin: 0;
+  font-size: 30px;
+  letter-spacing: 0.02em;
+}
+
+.app-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+h2 {
+  font-size: 19px;
+  margin: 0 0 10px;
+}
+
+.card {
+  background: var(--card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 17px;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.75);
+  box-shadow: var(--shadow);
+  animation: cardIn 0.45s ease both;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.14);
+}
+
+.card:nth-of-type(1) { animation-delay: 0.05s; }
+.card:nth-of-type(2) { animation-delay: 0.10s; }
+.card:nth-of-type(3) { animation-delay: 0.15s; }
+.card:nth-of-type(4) { animation-delay: 0.20s; }
+.card:nth-of-type(5) { animation-delay: 0.25s; }
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  padding: 13px;
+  margin: 8px 0;
+  font-size: 16px;
+  box-sizing: border-box;
+  border-radius: 14px;
+}
+
+input,
+select {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.10);
+  transform: translateY(-1px);
+}
+
+button,
+.file-button {
+  border: none;
+  background: linear-gradient(135deg, #111827, #374151);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.18);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+button:active,
+.file-button:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 10px rgba(17, 24, 39, 0.16);
+}
+
+button.sub {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+button.danger,
+.history-delete {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+ul {
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+li {
+  animation: itemIn 0.25s ease both;
+}
+
+.hidden {
+  display: none;
+}
+
+#resultModeText {
+  display: inline-block;
+  font-weight: 800;
+  margin: 4px 0 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 13px;
+}
+
+#resultList li {
+  background: #f8fafc;
+  padding: 10px 12px;
+  margin: 8px 0;
+  border-radius: 12px;
+  list-style-position: inside;
+  border: 1px solid #e5e7eb;
+}
+
+/* 対象メンバー */
+
+#targetMembers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.member-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 11px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.member-check:active {
+  transform: scale(0.98);
+}
+
+.member-check input {
+  width: auto;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: #111827;
+}
+
+.member-check span {
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 支払い履歴 */
+
+.history-area {
+  animation: openArea 0.25s ease both;
+}
+
+.history-item {
+  list-style: none;
+  margin: 10px 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  animation: itemIn 0.25s ease both;
+}
+
+.history-main {
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.history-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.history-delete {
+  padding: 9px;
+  font-size: 14px;
+}
+
+/* CSV読み込みボタン */
+
+.file-input {
+  display: none;
+}
+
+.file-button {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  margin: 8px 0;
+  font-size: 16px;
+  box-sizing: border-box;
+  text-align: center;
+  border-radius: 14px;
+}
+
+/* トースト */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(17, 24, 39, 0.94);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.28);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  z-index: 999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* アニメーション */
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
   }
-
-  if (members.includes(name)) {
-    alert("同じ名前のメンバーがいます");
-    return;
-  }
-
-  members.push(name);
-  nameInput.value = "";
-
-  saveData();
-  render();
-  showToast("メンバーを追加しました");
-}
-
-function addPayment() {
-  const payer = document.getElementById("payer").value;
-  const amount = Number(document.getElementById("amount").value);
-  const targets = Array.from(document.querySelectorAll(".target:checked")).map(x => x.value);
-
-  if (members.length === 0) {
-    alert("先にメンバーを登録してください");
-    return;
-  }
-
-  if (!payer) {
-    alert("払った人を選択してください");
-    return;
-  }
-
-  if (!amount || amount <= 0) {
-    alert("金額を入力してください");
-    return;
-  }
-
-  if (targets.length === 0) {
-    alert("対象メンバーを選択してください");
-    return;
-  }
-
-  payments.push({
-    payer: payer,
-    amount: amount,
-    targets: targets
-  });
-
-  document.getElementById("amount").value = "";
-
-  saveData();
-  render();
-  showToast("支払いを登録しました");
-}
-
-function deletePayment(index) {
-  const payment = payments[index];
-
-  if (!payment) return;
-
-  const message =
-    `${payment.payer} が ${payment.amount}円 支払い\n` +
-    `対象：${payment.targets.join("、")}\n\n` +
-    `この履歴を削除しますか？`;
-
-  if (!confirm(message)) return;
-
-  payments.splice(index, 1);
-  saveData();
-  render();
-  showToast("履歴を削除しました");
-}
-
-function getRawDebts() {
-  const debts = {};
-
-  members.forEach(from => {
-    debts[from] = {};
-    members.forEach(to => {
-      if (from !== to) {
-        debts[from][to] = 0;
-      }
-    });
-  });
-
-  payments.forEach(payment => {
-    const share = payment.amount / payment.targets.length;
-
-    payment.targets.forEach(target => {
-      if (target === payment.payer) return;
-
-      if (!debts[target]) {
-        debts[target] = {};
-      }
-
-      if (!debts[target][payment.payer]) {
-        debts[target][payment.payer] = 0;
-      }
-
-      debts[target][payment.payer] += share;
-    });
-  });
-
-  return debts;
-}
-
-function calculateHistoryMode() {
-  const debts = getRawDebts();
-  const results = [];
-  const processed = new Set();
-
-  members.forEach(a => {
-    members.forEach(b => {
-      if (a === b) return;
-
-      const key1 = `${a}->${b}`;
-      const key2 = `${b}->${a}`;
-
-      if (processed.has(key1) || processed.has(key2)) return;
-
-      const ab = debts[a]?.[b] || 0;
-      const ba = debts[b]?.[a] || 0;
-      const diff = Math.round(ab - ba);
-
-      if (diff > 0) {
-        results.push(`${a} → ${b}：${diff}円`);
-      } else if (diff < 0) {
-        results.push(`${b} → ${a}：${Math.abs(diff)}円`);
-      }
-
-      processed.add(key1);
-      processed.add(key2);
-    });
-  });
-
-  return results;
-}
-
-function calculateMinimumMode() {
-  const balance = {};
-
-  members.forEach(member => {
-    balance[member] = 0;
-  });
-
-  payments.forEach(payment => {
-    const share = payment.amount / payment.targets.length;
-
-    balance[payment.payer] += payment.amount;
-
-    payment.targets.forEach(target => {
-      balance[target] -= share;
-    });
-  });
-
-  const creditors = [];
-  const debtors = [];
-
-  Object.keys(balance).forEach(name => {
-    const value = Math.round(balance[name]);
-
-    if (value > 0) {
-      creditors.push({
-        name: name,
-        amount: value
-      });
-    }
-
-    if (value < 0) {
-      debtors.push({
-        name: name,
-        amount: -value
-      });
-    }
-  });
-
-  const results = [];
-  let i = 0;
-  let j = 0;
-
-  while (i < debtors.length && j < creditors.length) {
-    const payAmount = Math.min(debtors[i].amount, creditors[j].amount);
-
-    results.push(`${debtors[i].name} → ${creditors[j].name}：${payAmount}円`);
-
-    debtors[i].amount -= payAmount;
-    creditors[j].amount -= payAmount;
-
-    if (debtors[i].amount === 0) {
-      i++;
-    }
-
-    if (creditors[j].amount === 0) {
-      j++;
-    }
-  }
-
-  return results;
-}
-
-function toggleResultMode() {
-  resultMode = resultMode === "minimum" ? "history" : "minimum";
-  render();
-  showToast(resultMode === "minimum" ? "最小精算に切替" : "履歴反映に切替");
-}
-
-function toggleHistory() {
-  historyVisible = !historyVisible;
-  render();
-}
-
-function renderMembers() {
-  const memberList = document.getElementById("memberList");
-  const payer = document.getElementById("payer");
-  const targetMembers = document.getElementById("targetMembers");
-
-  memberList.innerHTML = "";
-  payer.innerHTML = "";
-  targetMembers.innerHTML = "";
-
-  members.forEach(member => {
-    const li = document.createElement("li");
-    li.textContent = member;
-    memberList.appendChild(li);
-
-    const option = document.createElement("option");
-    option.value = member;
-    option.textContent = member;
-    payer.appendChild(option);
-
-    const label = document.createElement("label");
-    label.className = "member-check";
-
-    const checkbox = document.createElement("input");
-    checkbox.className = "target";
-    checkbox.type = "checkbox";
-    checkbox.value = member;
-    checkbox.checked = true;
-
-    const span = document.createElement("span");
-    span.textContent = member;
-
-    label.appendChild(checkbox);
-    label.appendChild(span);
-    targetMembers.appendChild(label);
-  });
-}
-
-function renderResults() {
-  const resultList = document.getElementById("resultList");
-  const resultModeText = document.getElementById("resultModeText");
-  const toggleButton = document.querySelector("button[onclick='toggleResultMode()']");
-
-  resultList.innerHTML = "";
-
-  let results;
-
-  if (resultMode === "minimum") {
-    resultModeText.textContent = "最小精算方式";
-    toggleButton.textContent = "履歴反映方式に切替";
-    results = calculateMinimumMode();
-  } else {
-    resultModeText.textContent = "履歴反映方式";
-    toggleButton.textContent = "最小精算方式に切替";
-    results = calculateHistoryMode();
-  }
-
-  if (results.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "精算はありません";
-    resultList.appendChild(li);
-  } else {
-    results.forEach(result => {
-      const li = document.createElement("li");
-      li.textContent = result;
-      resultList.appendChild(li);
-    });
+  to {
+    opacity: 1;
   }
 }
 
-function renderHistory() {
-  const historyArea = document.getElementById("historyArea");
-  const historyList = document.getElementById("historyList");
-  const historyButton = document.querySelector("button[onclick='toggleHistory()']");
-
-  historyList.innerHTML = "";
-
-  if (historyVisible) {
-    historyArea.classList.remove("hidden");
-    historyButton.textContent = "履歴を非表示";
-  } else {
-    historyArea.classList.add("hidden");
-    historyButton.textContent = "履歴を表示";
-    return;
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
   }
-
-  if (payments.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "履歴はありません";
-    historyList.appendChild(li);
-    return;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-
-  payments.forEach((payment, index) => {
-    const li = document.createElement("li");
-    li.className = "history-item";
-
-    const main = document.createElement("div");
-    main.className = "history-main";
-    main.textContent = `${index + 1}. ${payment.payer} が ${payment.amount}円 支払い`;
-
-    const sub = document.createElement("div");
-    sub.className = "history-sub";
-    sub.textContent = `対象：${payment.targets.join("、")}`;
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "history-delete";
-    deleteButton.textContent = "この履歴を削除";
-    deleteButton.onclick = () => deletePayment(index);
-
-    li.appendChild(main);
-    li.appendChild(sub);
-    li.appendChild(deleteButton);
-
-    historyList.appendChild(li);
-  });
 }
 
-function render() {
-  renderMembers();
-  renderResults();
-  renderHistory();
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-function clearInput() {
-  document.getElementById("memberName").value = "";
-  document.getElementById("amount").value = "";
-
-  document.querySelectorAll(".target").forEach(checkbox => {
-    checkbox.checked = true;
-  });
-
-  showToast("入力をクリアしました");
+@keyframes itemIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-function clearPayments() {
-  if (!confirm("支払い履歴だけ削除しますか？")) return;
-
-  payments = [];
-  saveData();
-  render();
-  showToast("支払い履歴を削除しました");
+@keyframes openArea {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 1200px;
+  }
 }
 
-function clearAll() {
-  if (!confirm("メンバーも支払い履歴も全て削除しますか？")) return;
-
-  members = [];
-  payments = [];
-  saveData();
-  render();
-  showToast("全データを削除しました");
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.65) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
 }
 
-function exportCSV() {
-  let csv = "type,payer,amount,targets\n";
-
-  payments.forEach(payment => {
-    csv += `payment,${payment.payer},${payment.amount},"${payment.targets.join("|")}"\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "warikan-data.csv";
-  a.click();
-
-  URL.revokeObjectURL(url);
-  showToast("CSVを出力しました");
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
-
-function importCSV(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-    const text = e.target.result;
-    const lines = text.split(/\r?\n/).slice(1);
-
-    payments = [];
-
-    lines.forEach(line => {
-      if (!line.trim()) return;
-
-      const cols = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-      if (!cols || cols.length < 4) return;
-
-      const payer = cols[1].replaceAll('"', "");
-      const amount = Number(cols[2].replaceAll('"', ""));
-      const targets = cols[3].replaceAll('"', "").split("|").filter(x => x);
-
-      payments.push({
-        payer: payer,
-        amount: amount,
-        targets: targets
-      });
-
-      if (!members.includes(payer)) {
-        members.push(payer);
-      }
-
-      targets.forEach(target => {
-        if (!members.includes(target)) {
-          members.push(target);
-        }
-      });
-    });
-
-    saveData();
-    render();
-
-    event.target.value = "";
-    showToast("CSVを読み込みました");
-  };
-
-  reader.readAsText(file);
-}
-
-render();
