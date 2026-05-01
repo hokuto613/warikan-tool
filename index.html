@@ -23,8 +23,8 @@
       <label>払った人</label>
       <select id="payer"></select>
 
-      <label>金額</label>
-      <input id="amount" type="number" placeholder="例：3000">
+      <label>支払った合計金額</label>
+      <input id="amount" type="number" placeholder="例：30000">
 
       <label>対象メンバー</label>
       <div id="targetMembers"></div>
@@ -35,6 +35,8 @@
 
     <section>
       <h2>精算結果</h2>
+      <p id="resultModeText">最小精算方式</p>
+      <button class="sub" onclick="toggleResultMode()">履歴反映方式に切替</button>
       <ul id="resultList"></ul>
     </section>
 
