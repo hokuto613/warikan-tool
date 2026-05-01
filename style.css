@@ -1,98 +1,54 @@
-body {
-  font-family: system-ui, sans-serif;
-  margin: 0;
-  background: #f6f7f9;
-  color: #222;
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>割り勘ツール</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>割り勘ツール</h1>
 
-main {
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 16px;
-}
+    <section>
+      <h2>メンバー登録</h2>
+      <input id="memberName" placeholder="名前を入力">
+      <button onclick="addMember()">メンバー追加</button>
+      <ul id="memberList"></ul>
+    </section>
 
-h1 {
-  text-align: center;
-  font-size: 28px;
-}
+    <section>
+      <h2>支払い登録</h2>
 
-h2 {
-  font-size: 20px;
-  margin-top: 0;
-}
+      <label>払った人</label>
+      <select id="payer"></select>
 
-section {
-  background: white;
-  padding: 16px;
-  margin-bottom: 16px;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
+      <label>支払った合計金額</label>
+      <input id="amount" type="number" placeholder="例：30000">
 
-label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
+      <label>対象メンバー</label>
+      <div id="targetMembers"></div>
 
-input,
-select,
-button {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  font-size: 16px;
-  box-sizing: border-box;
-}
+      <button onclick="addPayment()">支払い登録</button>
+      <button class="sub" onclick="clearInput()">入力クリア</button>
+    </section>
 
-button {
-  border: none;
-  border-radius: 10px;
-  background: #111;
-  color: white;
-  font-weight: bold;
-}
+    <section>
+      <h2>精算結果</h2>
+      <p id="resultModeText">最小精算方式</p>
+      <button class="sub" onclick="toggleResultMode()">履歴反映方式に切替</button>
+      <ul id="resultList"></ul>
+    </section>
 
-button.sub {
-  background: #666;
-}
+    <section>
+      <h2>データ管理</h2>
+      <button onclick="exportCSV()">CSV出力</button>
+      <input type="file" accept=".csv" onchange="importCSV(event)">
+      <button class="sub" onclick="clearPayments()">支払い履歴クリア</button>
+      <button class="danger" onclick="clearAll()">全削除</button>
+    </section>
+  </main>
 
-button.danger {
-  background: #c0392b;
-}
-
-ul {
-  padding-left: 20px;
-}
-
-/* ===== ここが重要（修正ポイント） ===== */
-
-#targetMembers {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.member-check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f1f3f5;
-  padding: 10px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.member-check input {
-  width: auto;
-  margin: 0;
-}
-
-.member-check span {
-  font-size: 15px;
-  white-space: nowrap;       /* ← 折り返し禁止 */
-  overflow: hidden;          /* ← はみ出し隠す */
-  text-overflow: ellipsis;   /* ← …で省略 */
-  max-width: 100%;
-}
+  <script src="script.js"></script>
+</body>
+</html>
