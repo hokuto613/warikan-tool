@@ -340,6 +340,52 @@ button.danger,
   transform: translateX(-50%) translateY(0);
 }
 
+/* 自作モーダル */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.50);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  z-index: 1000;
+  animation: modalFade 0.16s ease both;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  animation: modalPop 0.18s ease both;
+}
+
+.modal-box h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.modal-box p {
+  margin: 0 0 10px;
+  color: var(--text);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+#modalInput {
+  margin-top: 10px;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 /* アニメーション */
 
 @keyframes pageFade {
@@ -401,6 +447,22 @@ button.danger,
   to {
     opacity: 1;
     transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes modalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
