@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>割り勘ツール</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <main>
@@ -50,13 +50,17 @@
 
     <section>
       <h2>データ管理</h2>
+
       <button onclick="exportCSV()">CSV出力</button>
-      <input type="file" accept=".csv" onchange="importCSV(event)">
+
+      <label class="file-button" for="csvFile">CSV読み込み</label>
+      <input id="csvFile" class="file-input" type="file" accept=".csv,text/csv" onchange="importCSV(event)">
+
       <button class="sub" onclick="clearPayments()">支払い履歴クリア</button>
       <button class="danger" onclick="clearAll()">全削除</button>
     </section>
   </main>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
