@@ -1,5 +1,6 @@
 let members = JSON.parse(localStorage.getItem("members")) || [];
 let payments = JSON.parse(localStorage.getItem("payments")) || [];
+let resultMode = "minimum";
 
 function saveData() {
   localStorage.setItem("members", JSON.stringify(members));
@@ -52,11 +53,7 @@ function addPayment() {
     return;
   }
 
-  payments.push({
-    payer: payer,
-    amount: amount,
-    targets: targets
-  });
+  payments.push({ payer, amount, targets });
 
   document.getElementById("amount").value = "";
 
@@ -64,7 +61,65 @@ function addPayment() {
   render();
 }
 
-function calculate() {
+function getRawDebts() {
+  const debts = {};
+
+  members.forEach(from => {
+    debts[from] = {};
+    members.forEach(to => {
+      if (from !== to) debts[from][to] = 0;
+    });
+  });
+
+  payments.forEach(payment => {
+    const share = payment.amount / payment.targets.length;
+
+    payment.targets.forEach(target => {
+      if (target === payment.payer) return;
+
+      if (!debts[target]) debts[target] = {};
+      if (!debts[target][payment.payer]) debts[target][payment.payer] = 0;
+
+      debts[target][payment.payer] += share;
+    });
+  });
+
+  return debts;
+}
+
+function calculateHistoryMode() {
+  const debts = getRawDebts();
+  const results = [];
+  const processed = new Set();
+
+  members.forEach(a => {
+    members.forEach(b => {
+      if (a === b) return;
+
+      const key1 = `${a}->${b}`;
+      const key2 = `${b}->${a}`;
+
+      if (processed.has(key1) || processed.has(key2)) return;
+
+      const ab = debts[a]?.[b] || 0;
+      const ba = debts[b]?.[a] || 0;
+      const diff = Math.round(ab - ba);
+
+      if (diff > 0) {
+        results.push(`${a} → ${b}：${diff}円`);
+      } else if (diff < 0) {
+        results.push(`${b} → ${a}：${Math.abs(diff)}円`);
+      }
+
+      processed.add(key1);
+      processed.add(key2);
+    });
+  });
+
+  return results;
+}
+
+function calculateMinimumMode() {
   const balance = {};
 
   members.forEach(member => {
@@ -87,13 +142,8 @@ function calculate() {
   Object.keys(balance).forEach(name => {
     const value = Math.round(balance[name]);
 
-    if (value > 0) {
-      creditors.push({ name: name, amount: value });
-    }
-
-    if (value < 0) {
-      debtors.push({ name: name, amount: -value });
-    }
+    if (value > 0) creditors.push({ name, amount: value });
+    if (value < 0) debtors.push({ name, amount: -value });
   });
 
   const results = [];
@@ -115,11 +165,17 @@ function calculate() {
   return results;
 }
 
+function toggleResultMode() {
+  resultMode = resultMode === "minimum" ? "history" : "minimum";
+  render();
+}
+
 function render() {
   const memberList = document.getElementById("memberList");
   const payer = document.getElementById("payer");
   const targetMembers = document.getElementById("targetMembers");
   const resultList = document.getElementById("resultList");
+  const resultModeText = document.getElementById("resultModeText");
 
   memberList.innerHTML = "";
   payer.innerHTML = "";
@@ -153,7 +209,17 @@ function render() {
     targetMembers.appendChild(label);
   });
 
-  const results = calculate();
+  let results;
+
+  if (resultMode === "minimum") {
+    resultModeText.textContent = "最小精算方式";
+    document.querySelector("button[onclick='toggleResultMode()']").textContent = "履歴反映方式に切替";
+    results = calculateMinimumMode();
+  } else {
+    resultModeText.textContent = "履歴反映方式";
+    document.querySelector("button[onclick='toggleResultMode()']").textContent = "最小精算方式に切替";
+    results = calculateHistoryMode();
+  }
 
   if (results.length === 0) {
     const li = document.createElement("li");
@@ -234,20 +300,12 @@ function importCSV(event) {
       const amount = Number(cols[2].replaceAll('"', ""));
       const targets = cols[3].replaceAll('"', "").split("|");
 
-      payments.push({
-        payer: payer,
-        amount: amount,
-        targets: targets
-      });
+      payments.push({ payer, amount, targets });
 
-      if (!members.includes(payer)) {
-        members.push(payer);
-      }
+      if (!members.includes(payer)) members.push(payer);
 
       targets.forEach(target => {
-        if (!members.includes(target)) {
-          members.push(target);
-        }
+        if (!members.includes(target)) members.push(target);
       });
     });
 
