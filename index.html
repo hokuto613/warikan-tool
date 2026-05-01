@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>割り勘ツール</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="./style.css?v=7">
 </head>
 <body>
   <main>
@@ -23,6 +23,9 @@
 
     <section class="card">
       <h2>支払い登録</h2>
+
+      <label>タイトル</label>
+      <input id="paymentTitle" placeholder="例：高速代(行き)">
 
       <label>払った人</label>
       <select id="payer"></select>
@@ -53,13 +56,19 @@
     </section>
 
     <section class="card">
+      <h2>共有・読み込み</h2>
+
+      <button onclick="generateShareText()">共有テキスト作成</button>
+      <button class="sub" onclick="copyShareText()">テキストをコピー</button>
+
+      <label>共有テキスト</label>
+      <textarea id="shareText" placeholder="ここに共有用テキストが表示されます。LINEにそのまま貼れます。"></textarea>
+
+      <button onclick="importShareText()">このテキストを読み込む</button>
+    </section>
+
+    <section class="card">
       <h2>データ管理</h2>
-
-      <button onclick="exportCSV()">CSV出力</button>
-
-      <label class="file-button" for="csvFile">CSV読み込み</label>
-      <input id="csvFile" class="file-input" type="file" accept=".csv,text/csv" onchange="importCSV(event)">
-
       <button class="sub" onclick="clearPayments()">支払い履歴クリア</button>
       <button class="danger" onclick="clearAll()">全削除</button>
     </section>
@@ -67,6 +76,6 @@
 
   <div id="toast" class="toast">保存しました</div>
 
-  <script src="script.js?v=5"></script>
+  <script src="./script.js?v=7"></script>
 </body>
 </html>
